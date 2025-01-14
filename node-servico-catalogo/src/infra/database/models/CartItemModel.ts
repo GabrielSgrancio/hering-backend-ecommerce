@@ -20,6 +20,7 @@ class CartItemModel
   public userId!: number;
   public productId!: number;
   public quantity!: number;
+  public product?: ProductModel; 
 }
 
 CartItemModel.init(
@@ -54,7 +55,7 @@ CartItemModel.init(
 UserModel.hasMany(CartItemModel, { foreignKey: 'userId' });
 CartItemModel.belongsTo(UserModel, { foreignKey: 'userId' });
 
-ProductModel.hasMany(CartItemModel, { foreignKey: 'productId' });
+ProductModel.hasMany(CartItemModel, { foreignKey: 'productId' , as: 'product' });
 CartItemModel.belongsTo(ProductModel, { foreignKey: 'productId' });
 
 export default CartItemModel;
