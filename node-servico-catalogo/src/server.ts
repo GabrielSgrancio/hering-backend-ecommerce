@@ -8,7 +8,6 @@ import sequelize from './infra/database';
 (async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
     console.log('DB conectado.');
 
     const PORT = process.env.PORT || 3000;
