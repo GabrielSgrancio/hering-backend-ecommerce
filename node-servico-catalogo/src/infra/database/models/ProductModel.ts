@@ -6,6 +6,8 @@ interface ProductAttributes {
   name: string;
   price: number;
   stock: number;
+  color?: string;
+  size?: string;
 }
 
 interface ProductCreationAttributes extends Optional<ProductAttributes, 'id'> {}
@@ -18,6 +20,8 @@ class ProductModel
   public name!: string;
   public price!: number;
   public stock!: number;
+  public color?: string;
+  public size?: string;
 }
 
 ProductModel.init(
@@ -39,6 +43,14 @@ ProductModel.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
+    },
+    color: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    size: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   },
   {
