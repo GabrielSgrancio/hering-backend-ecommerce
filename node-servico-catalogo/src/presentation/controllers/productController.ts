@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import ProductModel from '../../infra/database/models/ProductModel';
+import PromotionModel from '../../infra/database/models/PromotionModel';
+import { Op } from 'sequelize';
 
 export async function createProduct(req: Request, res: Response) {
   try {
@@ -11,11 +13,35 @@ export async function createProduct(req: Request, res: Response) {
   }
 }
 
-export async function getProducts(_req: Request, res: Response) {
+export async function getProducts(req: Request, res: Response) {
   try {
+    // Existe promoção ativa?
+    const today = new Date();
+    const activePromotion = await PromotionModel.findOne({
+      where: {
+        start_date: { [Op.lte]: today },
+        end_date: { [Op.gte]: today }
+      },
+      order: [['id', 'DESC']]
+    });
+
     const products = await ProductModel.findAll();
-    return res.json(products);
+
+    // Se houver promoção ativa, calcula promoPrice
+    const discount = activePromotion ? Number(activePromotion.discount_percent) : 0;
+
+    const result = products.map((p) => {
+      const productData = p.toJSON() as any;
+      if (discount > 0) {
+        const promoPrice = productData.price * (1 - discount / 100);
+        productData.promoPrice = Number(promoPrice.toFixed(2));
+      }
+      return productData;
+    });
+
+    return res.json(result);
   } catch (error: any) {
+    console.error(error);
     return res.status(500).json({ error: error.message });
   }
 }
