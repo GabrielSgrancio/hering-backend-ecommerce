@@ -1,18 +1,21 @@
-import app from './app';
-import sequelize from './infra/database';
+import dotenv from 'dotenv';
+dotenv.config(); 
 
-const PORT = process.env.PORT || 3000;
+import app from './app';    
+import sequelize from './infra/database'; 
+
 
 (async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync(); 
-    console.log('Conectado ao banco de dados com sucesso.');
+    await sequelize.sync();
+    console.log('DB conectado.');
 
+    const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Servidor rodando em http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Erro ao conectar no banco:', error);
+    console.error('Erro ao conectar DB:', error);
   }
 })();

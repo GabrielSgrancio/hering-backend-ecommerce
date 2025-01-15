@@ -1,0 +1,5 @@
+ALTER TABLE products
+  ADD COLUMN size VARCHAR(50),
+  ADD COLUMN color VARCHAR(50);
+
+  
