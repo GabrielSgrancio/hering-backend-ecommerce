@@ -95,32 +95,29 @@ export async function checkout(req: Request, res: Response) {
       return acc + price * item.quantity;
     }, 0);
 
-    // INTEGRAÇÃO COM O SERVIÇO DE PEDIDOS 
-    let orderResponse;
-    const orderServiceUrl = process.env.ORDER_SERVICE_URL;
+    // Integração com o microserviço Java
+    const orderServiceUrl = process.env.ORDER_SERVICE_URL; 
 
-    if (orderServiceUrl) {
-      const payload = {
-        userId,
-        totalAmount,
-        items: cartItems.map(ci => ({
-          productId: ci.productId,
-          quantity: ci.quantity
-        }))
-      };
-      const response = await axios.post(orderServiceUrl, payload);
-      orderResponse = response.data;
+    if (!orderServiceUrl) {
+      return res.status(500).json({ error: 'ORDER_SERVICE_URL não definido' });
     }
 
-    // Limpa o carrinho 
+    
+    const payload = { userId, totalAmount };
+  
+    const response = await axios.post(orderServiceUrl, payload);
+    const orderData = response.data; 
+
+    
     await CartItemModel.destroy({ where: { userId } });
 
+    // Retorna info ao cliente
     return res.json({
-      message: 'Checkout concluído com sucesso!',
-      totalAmount,
-      orderResponse
+      message: 'Pedido criado com sucesso!',
+      order: orderData
     });
-  } catch (error: any) {
-    return res.status(500).json({ error: error.message });
+  } catch (error) {
+    console.error('Erro no checkout:', error);
+    return res.status(500).json({ error: (error as any).message });
   }
 }
